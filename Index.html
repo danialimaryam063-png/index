@@ -1,0 +1,1070 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>راز فاصله | ماجراجویی ریاضی</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+--navy:#18344e;
+--blue:#277da5;
+--gold:#e8ad45;
+--green:#28865d;
+--red:#bd4d4d;
+--cream:#fffaf0;
+}
+
+body{
+margin:0;
+height:100dvh;
+overflow:hidden;
+font-family:Tahoma,"Arial",sans-serif;
+background:linear-gradient(140deg,#142b46,#367b86);
+color:#263b50;
+}
+
+#game{
+height:100%;
+width:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:10px;
+}
+
+.screen{
+display:none;
+width:min(950px,100%);
+height:min(720px,97%);
+background:var(--cream);
+border-radius:22px;
+padding:clamp(12px,2.5vw,25px);
+box-shadow:0 16px 45px #0005;
+flex-direction:column;
+overflow:hidden;
+}
+
+.screen.active{display:flex}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:8px;
+border-bottom:1px solid #e5dfd3;
+padding-bottom:10px;
+flex-shrink:0;
+}
+
+.logo{
+font-weight:bold;
+color:var(--navy);
+font-size:14px;
+}
+
+.subtitle{
+font-size:12px;
+color:#748493;
+line-height:1.8;
+}
+
+.progress{
+display:flex;
+gap:4px;
+direction:ltr;
+}
+
+.progress span{
+width:17px;
+height:6px;
+border-radius:10px;
+background:#ddd;
+}
+
+.progress span.done{background:var(--gold)}
+
+.content{
+flex:1;
+min-height:0;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+gap:12px;
+}
+
+h1{
+font-size:clamp(23px,4vw,37px);
+color:var(--navy);
+margin:0;
+}
+
+h2{
+font-size:clamp(18px,3vw,25px);
+color:var(--navy);
+margin:0;
+}
+
+p{
+font-size:clamp(12px,1.8vw,15px);
+line-height:1.9;
+margin:0;
+}
+
+.math{
+direction:ltr;
+display:inline-block;
+font-family:Tahoma,sans-serif;
+font-size:clamp(19px,3.5vw,26px);
+font-weight:bold;
+color:#174c73;
+}
+
+.hero{
+width:100%;
+max-height:235px;
+min-height:130px;
+flex:1;
+border-radius:17px;
+overflow:hidden;
+background:linear-gradient(#a8d7e7,#e1f0df);
+position:relative;
+}
+
+.hero svg{
+width:100%;
+height:100%;
+display:block;
+}
+
+.info{
+background:#edf4f4;
+border-right:4px solid var(--blue);
+border-radius:10px;
+padding:10px 13px;
+width:100%;
+font-size:13px;
+line-height:1.9;
+text-align:right;
+}
+
+.axis-box{
+width:100%;
+background:white;
+border:1px solid #e1e5e8;
+border-radius:14px;
+padding:12px;
+}
+
+.axis{
+position:relative;
+height:65px;
+margin:8px 8%;
+direction:ltr;
+}
+
+.axis-line{
+position:absolute;
+top:29px;
+left:0;
+width:100%;
+height:3px;
+background:#526b80;
+}
+
+.axis-line:before,.axis-line:after{
+content:"";
+position:absolute;
+top:-5px;
+border-top:7px solid transparent;
+border-bottom:7px solid transparent;
+}
+
+.axis-line:before{
+left:-5px;
+border-right:10px solid #526b80;
+}
+
+.axis-line:after{
+right:-5px;
+border-left:10px solid #526b80;
+}
+
+.zero{
+position:absolute;
+left:50%;
+top:18px;
+height:23px;
+width:2px;
+background:#526b80;
+}
+
+.point{
+position:absolute;
+top:21px;
+width:15px;
+height:15px;
+border-radius:50%;
+transform:translateX(-50%);
+border:2px solid white;
+}
+
+.point.a{
+background:#d18b25;
+box-shadow:0 0 0 2px #d18b25;
+}
+
+.point.b{
+background:var(--green);
+box-shadow:0 0 0 2px var(--green);
+}
+
+.point-label{
+position:absolute;
+top:-4px;
+transform:translateX(-50%);
+font-size:12px;
+font-weight:bold;
+white-space:nowrap;
+}
+
+.axis-number{
+position:absolute;
+top:44px;
+transform:translateX(-50%);
+font-size:11px;
+direction:ltr;
+}
+
+.answers{
+width:100%;
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:9px;
+}
+
+.answer{
+border:2px solid #d8e0e5;
+border-radius:11px;
+padding:11px 6px;
+background:white;
+color:var(--navy);
+font-family:inherit;
+font-weight:bold;
+font-size:14px;
+cursor:pointer;
+min-height:43px;
+}
+
+.answer:hover{
+border-color:var(--blue);
+background:#eef7fb;
+}
+
+.answer.correct{
+border-color:var(--green);
+background:#e4f5eb;
+}
+
+.answer.wrong{
+border-color:var(--red);
+background:#fae9e9;
+}
+
+.answer:disabled{cursor:default}
+
+.feedback{
+width:100%;
+min-height:35px;
+border-radius:10px;
+padding:9px;
+background:#edf4f4;
+font-size:12px;
+line-height:1.9;
+display:none;
+}
+
+.feedback.show{display:block}
+
+.formula-card{
+background:#e9f3f4;
+border:2px solid #c9dfe1;
+border-radius:14px;
+padding:14px;
+width:100%;
+}
+
+.formula-card .math{
+font-size:clamp(23px,4vw,34px);
+}
+
+.buttons{
+display:flex;
+gap:9px;
+justify-content:center;
+flex-wrap:wrap;
+padding-top:11px;
+border-top:1px solid #e7e1d7;
+flex-shrink:0;
+}
+
+.btn{
+border:0;
+border-radius:11px;
+padding:11px 22px;
+font-family:inherit;
+font-weight:bold;
+cursor:pointer;
+font-size:13px;
+}
+
+.primary{background:var(--navy);color:white}
+.secondary{background:#e9edf0;color:#31485d}
+.gold{background:var(--gold);color:#392b0d}
+
+.btn:disabled{
+opacity:.4;
+cursor:not-allowed;
+}
+
+/* مرحله پنجم */
+
+.mission-content{
+justify-content:flex-start;
+padding-top:7px;
+gap:9px;
+}
+
+.location-cards{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+width:100%;
+}
+
+.location-card{
+background:#f0f5f3;
+border:1px solid #d9e5df;
+border-radius:12px;
+padding:7px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:3px;
+}
+
+.place-icon{font-size:28px}
+.location-card b{font-size:13px}
+
+.coordinate{
+direction:ltr;
+font-family:Tahoma,sans-serif;
+font-size:20px;
+font-weight:bold;
+}
+
+.negative{color:#bd4d4d}
+.positive{color:#28865d}
+
+.mission-axis{
+padding:7px 12px;
+}
+
+.mission-axis p{font-size:12px}
+
+.simple-axis{
+direction:ltr;
+height:53px;
+margin:4px 10%;
+position:relative;
+}
+
+.simple-axis .axis-line{top:20px}
+
+.axis-zero{
+position:absolute;
+left:50%;
+top:10px;
+height:21px;
+width:2px;
+background:#526b80;
+}
+
+.axis-dot{
+position:absolute;
+top:14px;
+width:13px;
+height:13px;
+border-radius:50%;
+transform:translateX(-50%);
+border:2px solid white;
+}
+
+.left-dot{left:33%;background:#bd4d4d}
+.right-dot{left:67%;background:#28865d}
+
+.axis-tick{
+position:absolute;
+top:34px;
+transform:translateX(-50%);
+font-family:Tahoma,sans-serif;
+font-size:11px;
+direction:ltr;
+}
+
+.left-tick{left:33%}
+.zero-tick{left:50%}
+.right-tick{left:67%}
+
+.mission-question{
+background:#f8f1df;
+border-right:4px solid #d9a33b;
+border-radius:10px;
+padding:8px 12px;
+width:100%;
+text-align:right;
+}
+
+.mission-question b{
+color:#77521b;
+font-size:13px;
+}
+
+.mission-question p{font-size:12px}
+
+.answer-area{
+width:100%;
+background:#edf4f4;
+border-radius:12px;
+padding:9px;
+}
+
+.answer-area label{
+display:block;
+font-weight:bold;
+font-size:13px;
+margin-bottom:7px;
+}
+
+.input-row{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+direction:rtl;
+}
+
+.input-row input{
+width:190px;
+max-width:65%;
+height:45px;
+border:2px solid #8baebc;
+background:white;
+border-radius:10px;
+font-family:Tahoma,sans-serif;
+font-size:22px;
+text-align:center;
+direction:ltr;
+padding:5px;
+}
+
+.input-row input:focus{
+border-color:#2476a8;
+outline:3px solid #2476a822;
+}
+
+.input-row span{
+font-weight:bold;
+font-size:14px;
+}
+
+/* صحنه گردشگری */
+
+.tour-scene{
+width:100%;
+border-radius:15px;
+overflow:hidden;
+background:linear-gradient(#a7d9ed,#e9f1d9);
+position:relative;
+}
+
+.tour-scene svg{
+width:100%;
+display:block;
+}
+
+.scene-caption{
+background:#e9f3f0;
+padding:7px;
+font-size:11px;
+color:#48675e;
+text-align:center;
+}
+
+@media(max-height:650px){
+.screen{padding:10px}
+.content{gap:6px}
+.mission-content{gap:5px}
+.hero{min-height:90px}
+.location-card{padding:4px}
+.place-icon{font-size:22px}
+.mission-question{padding:5px 9px}
+.answer-area{padding:6px}
+.input-row input{height:38px}
+.simple-axis{height:45px}
+.axis-tick{top:29px}
+}
+
+@media(max-width:500px){
+.screen{border-radius:14px}
+.answer{font-size:12px}
+.buttons .btn{padding:10px 15px}
+}
+</style>
+</head>
+
+<body>
+<div id="game">
+
+<!-- تصویرسازی مشترک منظره گردشگری -->
+<template id="scenery">
+<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+<circle cx="680" cy="55" r="30" fill="#ffe59b"/>
+<path d="M0 180 Q100 85 210 175 Q310 65 430 170 Q550 80 800 175 L800 300 L0 300Z" fill="#8eae8a"/>
+<path d="M0 215 Q150 140 300 215 Q450 150 800 205 L800 300 L0 300Z" fill="#628c6e"/>
+<path d="M0 220 Q170 190 300 220 Q490 250 800 210 L800 300 L0 300Z" fill="#65b6c4"/>
+<path d="M0 255 Q150 235 300 258 T800 248" stroke="#d8f0eb" stroke-width="4" fill="none"/>
+<path d="M0 280 Q170 260 330 280 T800 273" stroke="#d8f0eb" stroke-width="3" fill="none"/>
+<g transform="translate(80 100)">
+<path d="M0 70 L15 45 L28 70 L40 43 L55 70 L70 45 L88 70Z" fill="#e9e1ce"/>
+<rect x="15" y="70" width="65" height="75" fill="#b77d54"/>
+<path d="M10 70 L47 40 L85 70Z" fill="#a65f40"/>
+<rect x="38" y="90" width="17" height="55" fill="#5d4437"/>
+<path d="M20 83 H32 V102 H20Z M61 83 H73 V102 H61Z" fill="#e6c18d"/>
+</g>
+<g transform="translate(620 95)">
+<rect x="15" y="50" width="42" height="105" fill="#c88a57"/>
+<path d="M10 50 L36 15 L62 50Z" fill="#a85c3d"/>
+<rect x="28" y="5" width="17" height="18" fill="#d3a06a"/>
+<path d="M24 95 H48 V115 H24Z" fill="#614a3b"/>
+<path d="M25 60 H47 V74 H25Z" fill="#684b3a"/>
+<path d="M15 155 H57" stroke="#a85c3d" stroke-width="5"/>
+</g>
+<path d="M0 255 Q160 245 320 265 T800 250" stroke="#d2c19b" stroke-width="10" fill="none"/>
+</svg>
+</template>
+
+<!-- صفحه شروع -->
+<section class="screen active" id="s0">
+<div class="topbar">
+<div class="logo">🧭 راز فاصله</div>
+<div class="subtitle">ماجراجویی ریاضی در خرم‌آباد</div>
+</div>
+
+<div class="content">
+<div class="hero" id="hero-start"></div>
+<h1>راز فاصله</h1>
+<h2>یک مأموریت در مسیر گردشگری خرم‌آباد</h2>
+<p>
+در مسیر گردشگری شهر، دو گردشگر به کمک نیاز دارند.
+برای راهنمایی آن‌ها باید راز فاصله روی محور اعداد را کشف کنی.
+</p>
+<div class="info">
+🎯 راه‌ها را طی کن، سه موقعیت مختلف را بررسی کن،
+قانون فاصله را کشف کن و در پایان به گردشگران کمک کن.
+</div>
+<p class="subtitle">آماده‌ای کارآگاه ریاضی شوی؟</p>
+</div>
+
+<div class="buttons">
+<button class="btn primary" onclick="go(1)">شروع ماجراجویی ←</button>
+</div>
+</section>
+
+<!-- مرحله اول -->
+<section class="screen" id="s1">
+<div class="topbar">
+<div class="logo">مرحله اول | بررسی موقعیت‌ها</div>
+<div class="progress"><span class="done"></span><span></span><span></span><span></span><span></span><span></span></div>
+</div>
+
+<div class="content">
+<h2>دو نقطه در سمت راست صفر</h2>
+<p>دو نقطه A و B را روی محور مشاهده کن.</p>
+
+<div class="axis-box">
+<div class="math">A = +1 &nbsp;&nbsp; B = +4</div>
+<div class="axis">
+<div class="axis-line"></div>
+<div class="zero"></div>
+<div class="point a" style="left:55%"></div>
+<div class="point b" style="left:70%"></div>
+<div class="point-label" style="left:55%">A</div>
+<div class="point-label" style="left:70%">B</div>
+<div class="axis-number" style="left:50%">0</div>
+<div class="axis-number" style="left:55%">1</div>
+<div class="axis-number" style="left:70%">4</div>
+</div>
+</div>
+
+<p>برای رسیدن از A به B چند واحد باید حرکت کنیم؟</p>
+<div class="answers">
+<button class="answer" onclick="check(this,1,3)">۲ واحد</button>
+<button class="answer" onclick="check(this,1,3)">۳ واحد</button>
+<button class="answer" onclick="check(this,1,3)">۴ واحد</button>
+<button class="answer" onclick="check(this,1,3)">۵ واحد</button>
+</div>
+<div class="feedback" id="f1"></div>
+</div>
+
+<div class="buttons">
+<button class="btn primary" id="n1" disabled onclick="go(2)">ادامه ←</button>
+</div>
+</section>
+
+<!-- مرحله دوم -->
+<section class="screen" id="s2">
+<div class="topbar">
+<div class="logo">مرحله دوم | بررسی موقعیت‌ها</div>
+<div class="progress"><span class="done"></span><span class="done"></span><span></span><span></span><span></span><span></span></div>
+</div>
+
+<div class="content">
+<h2>دو نقطه در سمت چپ صفر</h2>
+<p>این بار هر دو نقطه در سمت چپ صفر قرار دارند.</p>
+
+<div class="axis-box">
+<div class="math">A = −4 &nbsp;&nbsp; B = −1</div>
+<div class="axis">
+<div class="axis-line"></div>
+<div class="zero"></div>
+<div class="point a" style="left:30%"></div>
+<div class="point b" style="left:45%"></div>
+<div class="point-label" style="left:30%">A</div>
+<div class="point-label" style="left:45%">B</div>
+<div class="axis-number" style="left:30%">−4</div>
+<div class="axis-number" style="left:45%">−1</div>
+<div class="axis-number" style="left:50%">0</div>
+</div>
+</div>
+
+<p>فاصله دو نقطه A و B چند واحد است؟</p>
+<div class="answers">
+<button class="answer" onclick="check(this,2,3)">۱ واحد</button>
+<button class="answer" onclick="check(this,2,3)">۲ واحد</button>
+<button class="answer" onclick="check(this,2,3)">۳ واحد</button>
+<button class="answer" onclick="check(this,2,3)">۵ واحد</button>
+</div>
+<div class="feedback" id="f2"></div>
+</div>
+
+<div class="buttons">
+<button class="btn secondary" onclick="go(1)">بازگشت</button>
+<button class="btn primary" id="n2" disabled onclick="go(3)">ادامه ←</button>
+</div>
+</section>
+
+<!-- مرحله سوم -->
+<section class="screen" id="s3">
+<div class="topbar">
+<div class="logo">مرحله سوم | بررسی موقعیت‌ها</div>
+<div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span></span><span></span><span></span></div>
+</div>
+
+<div class="content">
+<h2>دو نقطه در دو طرف صفر</h2>
+<p>حالا یکی از نقاط سمت چپ و دیگری سمت راست صفر است.</p>
+
+<div class="axis-box">
+<div class="math">A = −2 &nbsp;&nbsp; B = +3</div>
+<div class="axis">
+<div class="axis-line"></div>
+<div class="zero"></div>
+<div class="point a" style="left:40%"></div>
+<div class="point b" style="left:65%"></div>
+<div class="point-label" style="left:40%">A</div>
+<div class="point-label" style="left:65%">B</div>
+<div class="axis-number" style="left:40%">−2</div>
+<div class="axis-number" style="left:50%">0</div>
+<div class="axis-number" style="left:65%">+3</div>
+</div>
+</div>
+
+<p>برای رفتن از A به B چند واحد حرکت لازم است؟</p>
+<div class="answers">
+<button class="answer" onclick="check(this,3,5)">۱ واحد</button>
+<button class="answer" onclick="check(this,3,5)">۳ واحد</button>
+<button class="answer" onclick="check(this,3,5)">۵ واحد</button>
+<button class="answer" onclick="check(this,3,5)">۶ واحد</button>
+</div>
+<div class="feedback" id="f3"></div>
+</div>
+
+<div class="buttons">
+<button class="btn secondary" onclick="go(2)">بازگشت</button>
+<button class="btn primary" id="n3" disabled onclick="go(4)">ادامه ←</button>
+</div>
+</section>
+
+<!-- مرحله چهارم -->
+<section class="screen" id="s4">
+<div class="topbar">
+<div class="logo">مرحله چهارم | کشف قانون</div>
+<div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span></span><span></span></div>
+</div>
+
+<div class="content">
+<h2>حالا وقت کشف راز است!</h2>
+<p>به سه موقعیت قبلی توجه کن. می‌خواهیم قانونی پیدا کنیم که در هر سه حالت درست باشد.</p>
+
+<div class="formula-card">
+<p>فاصله دو نقطه روی محور، مستقل از ترتیب قرار گرفتن آن‌ها، همیشه نامنفی است.</p>
+<p style="margin-top:9px">
+کدام عبارت فاصله دو نقطه با مختصات
+<span class="math">x₁</span> و <span class="math">x₂</span>
+را در همه حالت‌ها نشان می‌دهد؟
+</p>
+</div>
+
+<div class="answers">
+<button class="answer" onclick="formula(this,1)"><span class="math">x₂ − x₁</span></button>
+<button class="answer" onclick="formula(this,2)"><span class="math">|x₂ − x₁|</span></button>
+<button class="answer" onclick="formula(this,3)"><span class="math">x₁ + x₂</span></button>
+<button class="answer" onclick="formula(this,4)"><span class="math">|x₁ + x₂|</span></button>
+</div>
+
+<div class="feedback" id="f4"></div>
+</div>
+
+<div class="buttons">
+<button class="btn secondary" onclick="go(3)">بازگشت</button>
+<button class="btn primary" id="n4" disabled onclick="go(5)">ادامه کشف ←</button>
+</div>
+</section>
+
+<!-- مرحله پنجم -->
+<section class="screen" id="s5">
+<div class="topbar">
+<div class="logo">مرحله پنجم | مأموریت گردشگری</div>
+<div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span></span></div>
+</div>
+
+<div class="content mission-content">
+
+<h2>به گردشگران کمک کن!</h2>
+
+<!-- تصویر گردشگران و جاذبه های شهر -->
+<div class="tour-scene">
+<svg viewBox="0 0 800 260" xmlns="http://www.w3.org/2000/svg">
+<rect width="800" height="260" fill="#b8e0ed"/>
+<circle cx="680" cy="45" r="25" fill="#ffe59b"/>
+<path d="M0 160 Q140 75 270 160 Q420 70 560 155 Q690 85 800 150 V260 H0Z" fill="#82a98a"/>
+<path d="M0 195 Q200 145 400 190 Q600 140 800 185 V260 H0Z" fill="#65b6c4"/>
+<path d="M0 235 Q180 210 350 237 T800 225" stroke="#d9f4ee" stroke-width="4" fill="none"/>
+
+<!-- مناره -->
+<g transform="translate(100 50)">
+<rect x="25" y="45" width="55" height="115" rx="3" fill="#bd8052"/>
+<path d="M20 45 L52 8 L85 45Z" fill="#9f5d3e"/>
+<rect x="42" y="70" width="20" height="30" fill="#634a3b"/>
+<rect x="43" y="120" width="18" height="40" fill="#634a3b"/>
+<path d="M25 65 H80 M25 110 H80" stroke="#e6c18d" stroke-width="4"/>
+</g>
+
+<!-- دریاچه کیو و کوه -->
+<g transform="translate(580 65)">
+<path d="M0 95 L50 20 L95 95 L140 30 L205 95Z" fill="#718f7c"/>
+<path d="M0 100 Q100 75 220 100 L220 140 L0 140Z" fill="#5cb7c5"/>
+</g>
+
+<!-- گردشگر اول -->
+<g transform="translate(350 105)">
+<circle cx="25" cy="22" r="17" fill="#f0c49b"/>
+<path d="M10 17 Q10 -4 35 8 L41 19Z" fill="#49372f"/>
+<rect x="8" y="40" width="34" height="58" rx="10" fill="#d76d4c"/>
+<path d="M12 98 L8 140 M36 98 L43 140" stroke="#344c62" stroke-width="10" stroke-linecap="round"/>
+<path d="M8 52 L-5 82 M42 52 L57 76" stroke="#f0c49b" stroke-width="8" stroke-linecap="round"/>
+<rect x="43" y="49" width="15" height="28" rx="4" fill="#e3ae46"/>
+</g>
+
+<!-- گردشگر دوم -->
+<g transform="translate(435 112)">
+<circle cx="25" cy="19" r="16" fill="#dcae8d"/>
+<path d="M10 14 Q15 -8 38 7 L40 20Z" fill="#45362f"/>
+<rect x="7" y="38" width="36" height="57" rx="9" fill="#477e9e"/>
+<path d="M13 94 L10 137 M37 94 L43 137" stroke="#344c62" stroke-width="9" stroke-linecap="round"/>
+<path d="M8 51 L-3 80 M42 50 L57 79" stroke="#dcae8d" stroke-width="8" stroke-linecap="round"/>
+<rect x="-9" y="73" width="16" height="18" rx="3" fill="#b87843"/>
+</g>
+
+<path d="M280 240 Q400 210 520 240" stroke="#d9c69a" stroke-width="8" fill="none"/>
+</svg>
+</div>
+
+<div class="scene-caption">
+دو گردشگر در مسیر گردشگری خرم‌آباد منتظر راهنمایی تو هستند!
+</div>
+
+<div class="location-cards">
+<div class="location-card">
+<span class="place-icon">🏛️</span>
+<b>مناره آجری</b>
+<span class="coordinate negative">−۱٫۷</span>
+</div>
+<div class="location-card">
+<span class="place-icon">🏞️</span>
+<b>دریاچه کیو</b>
+<span class="coordinate positive">+۲٫۷</span>
+</div>
+</div>
+
+<div class="axis-box mission-axis">
+<p><b>موقعیت دو جاذبه روی محور فرضی</b></p>
+<div class="simple-axis">
+<div class="axis-line"></div>
+<div class="axis-zero"></div>
+<div class="axis-dot left-dot"></div>
+<div class="axis-dot right-dot"></div>
+<span class="axis-tick left-tick">−۱٫۷</span>
+<span class="axis-tick zero-tick">۰</span>
+<span class="axis-tick right-tick">+۲٫۷</span>
+</div>
+</div>
+
+<div class="mission-question">
+<b>مأموریت تو چیست؟</b>
+<p>فاصله دریاچه کیو تا مناره آجری را محاسبه کن تا بتوانیم گردشگران را راهنمایی کنیم.</p>
+<p class="subtitle">مختصات فرضی و برای مدل‌سازی ریاضی هستند؛ نه فاصله جغرافیایی واقعی.</p>
+</div>
+
+<div class="answer-area">
+<label for="result">پاسخ خود را بر حسب واحد بنویس:</label>
+<div class="input-row">
+<input id="result" type="text" inputmode="decimal" autocomplete="off" placeholder="۴٫۴" dir="ltr">
+<span>واحد</span>
+</div>
+</div>
+
+<div class="feedback" id="f5"></div>
+
+</div>
+
+<div class="buttons">
+<button class="btn secondary" onclick="go(4)">بازگشت</button>
+<button class="btn primary" id="check-mission" onclick="mission()">بررسی پاسخ</button>
+</div>
+</section>
+
+<!-- صفحه پایانی -->
+<section class="screen" id="s6">
+<div class="topbar">
+<div class="logo">پایان مأموریت</div>
+<div class="subtitle">کارآگاه ریاضی</div>
+</div>
+
+<div class="content">
+<div class="hero" id="hero-end"></div>
+<h1>آفرین! مأموریت موفقیت‌آمیز بود.</h1>
+<p>
+تو با بررسی سه موقعیت مختلف، قانون فاصله دو نقطه را کشف کردی
+و از آن برای حل مسئله‌ای در مسیر گردشگری خرم‌آباد استفاده کردی.
+</p>
+
+<div class="formula-card">
+<p>قانون کشف‌شده:</p>
+<div class="math">d(A,B)=|x₂−x₁|</div>
+<br>
+<div class="math">|2.7−(−1.7)|=4.4</div>
+</div>
+
+<div class="info">
+<b>نتیجه مأموریت:</b>
+فاصله دو موقعیت در مدل ریاضی برابر ۴٫۴ واحد است.
+این قانون برای هر دو نقطه روی محور اعداد معتبر است.
+</div>
+</div>
+
+<div class="buttons">
+<button class="btn secondary" onclick="restart()">شروع دوباره ↻</button>
+</div>
+</section>
+
+</div>
+
+<script>
+
+/* افزودن تصویرسازی به صفحه شروع و پایان */
+document.getElementById('hero-start').innerHTML =
+document.getElementById('scenery').innerHTML;
+
+document.getElementById('hero-end').innerHTML =
+document.getElementById('scenery').innerHTML;
+
+/* جابه‌جایی صفحات */
+
+function go(n){
+document.querySelectorAll('.screen').forEach(s=>{
+s.classList.remove('active');
+});
+document.getElementById('s'+n).classList.add('active');
+}
+
+/* تبدیل اعداد فارسی و عربی به انگلیسی */
+
+function normalizeNumber(str){
+return String(str)
+.replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+.replace(/٫/g,'.')
+.replace(/,/g,'.')
+.trim();
+}
+
+/* پاسخ‌های سه مرحله اکتشافی */
+
+const explanations={
+1:"در این حالت هر دو عدد مثبت‌اند. فاصله برابر ۴ منهای ۱، یعنی ۳ واحد است.",
+2:"در این حالت هر دو عدد منفی‌اند. فاصله از ۴− تا ۱− برابر ۳ واحد است.",
+3:"دو نقطه در دو طرف صفر قرار دارند. فاصله برابر ۲ واحد تا صفر به‌علاوه ۳ واحد است؛ یعنی ۵ واحد."
+};
+
+function check(btn,stage,correct){
+
+const parent=btn.parentElement;
+const buttons=parent.querySelectorAll('.answer');
+const feedback=document.getElementById('f'+stage);
+const next=document.getElementById('n'+stage);
+
+if(!next.disabled)return;
+
+const selected=Number(normalizeNumber(btn.textContent).replace('واحد',''));
+
+buttons.forEach(b=>{
+b.disabled=true;
+const v=Number(normalizeNumber(b.textContent).replace('واحد',''));
+if(v===correct)b.classList.add('correct');
+});
+
+if(selected===correct){
+feedback.innerHTML="✅ پاسخ درست است!<br>"+explanations[stage];
+}else{
+btn.classList.add('wrong');
+feedback.innerHTML="پاسخ درست: "+correct+" واحد.<br>"+explanations[stage];
+}
+
+feedback.classList.add('show');
+next.disabled=false;
+}
+
+/* کشف فرمول */
+
+function formula(btn,choice){
+
+const buttons=btn.parentElement.querySelectorAll('.answer');
+const feedback=document.getElementById('f4');
+const next=document.getElementById('n4');
+
+if(!next.disabled)return;
+
+buttons.forEach(b=>b.disabled=true);
+
+if(choice===2){
+btn.classList.add('correct');
+feedback.innerHTML=
+"✅ درست کشف کردی! قدرمطلق تفاضل مختصات، همیشه فاصله‌ای نامنفی به ما می‌دهد؛ حتی اگر ترتیب دو نقطه عوض شود.";
+}else{
+btn.classList.add('wrong');
+buttons[1].classList.add('correct');
+feedback.innerHTML=
+"به علامت فاصله توجه کن. فاصله نمی‌تواند منفی باشد. عبارت درست، قدرمطلق تفاضل دو مختصات است.";
+}
+
+feedback.classList.add('show');
+next.disabled=false;
+}
+
+/* بررسی پاسخ مأموریت نهایی */
+
+function mission(){
+
+const input=document.getElementById('result');
+const feedback=document.getElementById('f5');
+const next=document.getElementById('check-mission');
+
+if(next.disabled)return;
+
+const value=normalizeNumber(input.value);
+const number=Number(value);
+
+if(value==="" || !Number.isFinite(number)){
+feedback.innerHTML="لطفاً پاسخ عددی خود را وارد کن.";
+feedback.classList.add('show');
+input.focus();
+return;
+}
+
+if(Math.abs(number-4.4)<0.001){
+
+feedback.innerHTML=
+"🎉 آفرین! پاسخ درست است.<br>"+
+"فاصله برابر است با: <span class='math'>|2.7−(−1.7)|=4.4</span><br>"+
+"حالا گردشگران می‌توانند مسیر خود را پیدا کنند.";
+
+feedback.classList.add('show');
+next.disabled=true;
+input.disabled=true;
+
+setTimeout(()=>go(6),1800);
+
+}else{
+
+feedback.innerHTML=
+"هنوز به جواب نرسیده‌ای!<br>"+
+"از فرمول کشف‌شده استفاده کن و به علامت عدد منفی دقت کن.";
+
+feedback.classList.add('show');
+input.focus();
+}
+}
+
+/* بازنشانی کامل بازی */
+
+function restart(){
+
+/* پاک کردن همه انتخاب‌ها */
+document.querySelectorAll('.answer').forEach(btn=>{
+btn.disabled=false;
+btn.classList.remove('correct','wrong','selected');
+});
+
+/* پاک کردن بازخوردها */
+document.querySelectorAll('.feedback').forEach(box=>{
+box.innerHTML='';
+box.classList.remove('show');
+});
+
+/* قفل کردن مجدد دکمه‌های ادامه */
+for(let i=1;i<=4;i++){
+document.getElementById('n'+i).disabled=true;
+}
+
+/* بازنشانی ورودی مرحله پنجم */
+const input=document.getElementById('result');
+input.value='';
+input.disabled=false;
+
+/* فعال کردن دکمه بررسی */
+document.getElementById('check-mission').disabled=false;
+
+/* بازگشت به شروع */
+go(0);
+}
+
+</script>
+</body>
+</html>
